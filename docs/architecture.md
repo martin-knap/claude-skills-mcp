@@ -18,7 +18,7 @@ The backend consists of seven core components working together to provide intell
 **Purpose**: Manages server configuration and provides sensible defaults.
 
 **Key Features**:
-- Default configuration with both Anthropic and K-Dense AI scientific skills repositories
+- Default configuration pointing to the `martin-knap/skills` GitHub repository (with optional local directory fallback)
 - JSON-based config loading with validation
 - Fallback to defaults if config unavailable or malformed
 - Config printer (--example-config) showing default configuration
@@ -590,4 +590,3 @@ Solutions:
 - `config.py`: Configuration management
 
 **Dependencies**: `mcp`, `torch`, `sentence-transformers`, `starlette`, `uvicorn`, `httpx`, `numpy` (~250 MB total)
-

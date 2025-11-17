@@ -2,13 +2,8 @@
   "skill_sources": [
     {
       "type": "github",
-      "url": "https://github.com/anthropics/skills",
-      "comment": "Official Anthropic skills - diverse examples with Python scripts, images, documents"
-    },
-    {
-      "type": "github",
-      "url": "https://github.com/K-Dense-AI/claude-scientific-skills",
-      "comment": "70+ scientific skills for bioinformatics, cheminformatics, and analysis"
+      "url": "https://github.com/martin-knap/skills",
+      "comment": "Default remote skills repository (customizable)"
     },
     {
       "type": "local",
@@ -33,4 +28,3 @@
   "github_api_token": null,
   "comment_token": "Optional GitHub personal access token for 5000 req/hr (default: 60 req/hr)"
 }
-

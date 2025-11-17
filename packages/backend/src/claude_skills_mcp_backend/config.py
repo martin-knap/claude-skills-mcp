@@ -11,11 +11,7 @@ DEFAULT_CONFIG = {
     "skill_sources": [
         {
             "type": "github",
-            "url": "https://github.com/anthropics/skills",
-        },
-        {
-            "type": "github",
-            "url": "https://github.com/K-Dense-AI/claude-scientific-skills",
+            "url": "https://github.com/martin-knap/skills",
         },
         {
             "type": "local",
@@ -98,13 +94,8 @@ def get_example_config() -> str:
         "skill_sources": [
             {
                 "type": "github",
-                "url": "https://github.com/anthropics/skills",
-                "comment": "Official Anthropic skills - diverse examples with Python scripts, images, documents",
-            },
-            {
-                "type": "github",
-                "url": "https://github.com/K-Dense-AI/claude-scientific-skills",
-                "comment": "70+ scientific skills for bioinformatics, cheminformatics, and analysis",
+                "url": "https://github.com/martin-knap/skills",
+                "comment": "Default remote skills repository (customizable)",
             },
             {
                 "type": "local",

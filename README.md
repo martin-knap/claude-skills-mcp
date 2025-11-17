@@ -12,7 +12,7 @@ A Model Context Protocol (MCP) server that provides intelligent search capabilit
 
 **An open-source project by [K-Dense AI](https://k-dense.ai)** - creators of autonomous AI scientists for scientific research.
 
-This MCP server enables any MCP-compatible AI assistant to intelligently search and retrieve skills from our curated [Claude Scientific Skills](https://github.com/K-Dense-AI/claude-scientific-skills) repository and other skill sources like the [Official Claude Skills](https://github.com/anthropics/skills).
+This MCP server enables any MCP-compatible AI assistant to intelligently search and retrieve skills from the [martin-knap/skills](https://github.com/martin-knap/skills) repository (the default remote source) or any local/remote repositories you configure.
 
 <a href="https://cursor.com/en-US/install-mcp?name=claude-skills-mcp&config=eyJjb21tYW5kIjoidXZ4IGNsYXVkZS1za2lsbHMtbWNwIn0%3D">
   <picture>
@@ -66,7 +66,7 @@ Run the server with default configuration:
 uvx claude-skills-mcp
 ```
 
-This starts the lightweight frontend which auto-downloads the backend and loads ~90 skills from Anthropic's official skills repository and K-Dense AI's scientific skills collection.
+This starts the lightweight frontend which auto-downloads the backend and loads skills from [martin-knap/skills](https://github.com/martin-knap/skills) (or other sources you configure).
 
 ### With Custom Configuration
 
@@ -125,8 +125,7 @@ See [Architecture Guide](docs/architecture.md) for detailed design and data flow
 Load skills from **GitHub repositories** (direct skills or Claude Code plugins) or **local directories**. 
 
 By default, loads from:
-- [Official Anthropic Skills](https://github.com/anthropics/skills) - 15 diverse skills for documents, presentations, web artifacts, and more
-- [K-Dense AI Scientific Skills](https://github.com/K-Dense-AI/claude-scientific-skills) - 78+ specialized skills for bioinformatics, cheminformatics, and scientific analysis
+- [martin-knap/skills](https://github.com/martin-knap/skills) - customizable curated skills collection
 - Local directory `~/.claude/skills` (if it exists)
 
 ## Contributing
