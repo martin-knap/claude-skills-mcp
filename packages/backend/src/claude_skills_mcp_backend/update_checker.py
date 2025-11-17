@@ -144,7 +144,7 @@ class GitHubSourceTracker:
 
         headers = {}
         if self.github_token:
-            headers["Authorization"] = f"token {self.github_token}"
+            headers["Authorization"] = f"Bearer {self.github_token}"
 
         try:
             with httpx.Client(timeout=30.0) as client:

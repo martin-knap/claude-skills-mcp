@@ -794,8 +794,14 @@ def load_from_github(
         if tree_data is None:
             api_url = f"https://api.github.com/repos/{owner}/{repo}/git/trees/{branch}?recursive=1"
 
+            # Add GitHub token if available
+            headers = {}
+            github_token = config.get("github_api_token")
+            if github_token:
+                headers["Authorization"] = f"Bearer {github_token}"
+
             with httpx.Client(timeout=30.0) as client:
-                response = client.get(api_url)
+                response = client.get(api_url, headers=headers)
                 response.raise_for_status()
                 tree_data = response.json()
 

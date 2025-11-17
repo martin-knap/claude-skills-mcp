@@ -21,41 +21,34 @@ wheels/
 *.egg
 
 # Virtual environments
-.venv/
 venv/
 ENV/
 env/
 
-# IDE
+# IDEs
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS
-.DS_Store
-Thumbs.db
-
 # Testing
 .pytest_cache/
 .coverage
-.coverage.*
 htmlcov/
-*.cover
-.hypothesis/
-.tox/
+
+# Configuration with secrets
+config.json
+deployment-config.json
+DEPLOYMENT.md
 
 # Logs
 *.log
 
-# Config files (except examples)
-config.json
-!config.example.json
+# OS
+.DS_Store
+Thumbs.db
 
-# UV
-.uv/
-
-# Model cache
+# Cache
 .cache/
-sentence_transformers/
+*.cache
