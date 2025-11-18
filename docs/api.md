@@ -30,7 +30,6 @@ Always call this tool FIRST whenever the question requires any domain-specific k
 |-----------|------|----------|---------|-------------|
 | `task_description` | string | Yes | - | Description of the task you want to accomplish. Be specific about your goal, context, or problem domain for better results (e.g., 'debug Python API errors', 'process genomic data', 'build React dashboard') |
 | `top_k` | integer | No | 3 | Number of skills to return (1-20). Higher values provide more options but may include less relevant results |
-| `list_documents` | boolean | No | true | Include a list of available documents (scripts, references, assets) for each skill |
 
 ### Output Format
 
@@ -39,9 +38,8 @@ Returns the most relevant skills with:
 - **Description**: Brief summary of what the skill does
 - **Relevance score**: 0-1, higher is better
 - **Source**: GitHub URL or local path
-- **Full content**: Complete SKILL.md markdown (or truncated with source link if `max_skill_content_chars` is configured)
 - **Document count**: Number of additional files available
-- **Document list**: Paths and metadata for scripts, references, assets (if `list_documents=true`)
+- **Next step prompt**: Reminder to call `read_skill_document` for the full SKILL.md or supporting files
 
 ### Examples
 
@@ -61,7 +59,7 @@ Relevance Score: 0.8234
 Source: K-Dense-AI/claude-scientific-skills
 Description: Single-cell RNA sequencing analysis framework...
 Additional Documents: 2 file(s)
-[Full SKILL.md content...]
+Use `read_skill_document` to open SKILL.md or supporting files.
 ```
 
 **Example 2: Drug Discovery**
@@ -463,25 +461,20 @@ Solution: Access via URL rather than base64.
 
 ## Configuration Impact
 
-### max_skill_content_chars
+### max_search_results
 
-When set, truncates skill content in `find_helpful_skills` results:
+Controls the maximum number of results returned by `find_helpful_skills`:
 
 ```json
 {
-  "max_skill_content_chars": 5000
+  "max_search_results": 3
 }
 ```
 
-**Effect**:
-```
-[Skill content truncated at 5000 characters]
-[View full skill at: https://github.com/...]
-```
-
-**Recommendation**: 
-- Leave at `null` (unlimited) unless context window is a concern
-- If set, use 5000-10000 for good balance
+**Recommendation**:
+- Keep at 3 for concise, high-signal responses
+- Increase to 5 if you consistently need more options
+- Don't exceed 10 to avoid flooding the assistant with summaries
 
 ### default_top_k
 
@@ -550,7 +543,7 @@ When integrating these tools into an AI assistant:
 
 1. **Prefer search over list**: find_helpful_skills is more efficient
 2. **Progressive disclosure**: Load details only when needed
-3. **Truncate wisely**: Use max_skill_content_chars if context is tight
+3. **Summarize**: Stick to the returned descriptions; call `read_skill_document` only when deeper detail is required
 
 ### Error Recovery
 

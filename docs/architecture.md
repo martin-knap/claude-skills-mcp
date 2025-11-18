@@ -205,7 +205,7 @@ Frontend Proxy → AI Assistant
 **Progressive Disclosure Implementation**:
 1. **Level 1**: Tool names/descriptions (always in context)
 2. **Level 2**: Skill names/descriptions (search results)
-3. **Level 3**: Full SKILL.md content (when skill is relevant)
+3. **Level 3**: Full SKILL.md content (requested via `read_skill_document`)
 4. **Level 4**: Additional documents (scripts, data, references)
 
 This architecture minimizes context window usage while ensuring all necessary information is available when needed.

@@ -595,6 +595,7 @@ def _create_document_fetcher(
     text_extensions: list[str],
     image_extensions: list[str],
     max_image_size: int,
+    github_token: str | None = None,
 ) -> Callable:
     """Create a closure that fetches documents on-demand with disk caching.
 
@@ -660,8 +661,13 @@ def _create_document_fetcher(
         try:
             file_ext = Path(doc_path).suffix.lower()
 
+            # Add GitHub token if available
+            headers = {}
+            if github_token:
+                headers["Authorization"] = f"Bearer {github_token}"
+
             with httpx.Client(timeout=30.0) as client:
-                response = client.get(url)
+                response = client.get(url, headers=headers)
                 response.raise_for_status()
 
                 # Process based on file type
@@ -824,8 +830,14 @@ def load_from_github(
             try:
                 raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{skill_path}"
 
+                # Add GitHub token if available
+                headers = {}
+                github_token = config.get("github_api_token")
+                if github_token:
+                    headers["Authorization"] = f"Bearer {github_token}"
+
                 with httpx.Client(timeout=30.0) as client:
-                    response = client.get(raw_url)
+                    response = client.get(raw_url, headers=headers)
                     response.raise_for_status()
                     content = response.text
 
@@ -860,6 +872,7 @@ def load_from_github(
                             text_extensions,
                             image_extensions,
                             max_image_size,
+                            github_token,
                         )
 
                         skill.documents = documents

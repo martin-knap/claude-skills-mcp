@@ -48,11 +48,6 @@ TOOL_SCHEMAS = [
                     "minimum": 1,
                     "maximum": 20,
                 },
-                "list_documents": {
-                    "type": "boolean",
-                    "description": "Include a list of available documents (scripts, references, assets) for each skill (default: True)",
-                    "default": True,
-                },
             },
             "required": ["task_description"],
         },

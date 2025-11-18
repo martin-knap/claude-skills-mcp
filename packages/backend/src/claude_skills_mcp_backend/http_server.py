@@ -65,7 +65,10 @@ class LoadingState:
             return f"[LOADING: {self.loaded_skills} skills loaded so far, indexing in progress...]\n"
 
 
-def register_mcp_tools(default_top_k: int = 3, max_content_chars: int | None = None):
+def register_mcp_tools(
+    default_top_k: int = 3,
+    max_results: int = 3,
+):
     """Register MCP tools using FastMCP decorators."""
     
     # Import handle functions from mcp_handlers
@@ -89,15 +92,14 @@ def register_mcp_tools(default_top_k: int = 3, max_content_chars: int | None = N
     async def find_helpful_skills(
         task_description: str,
         top_k: int = default_top_k,
-        list_documents: bool = True
     ) -> list[TextContent]:
         """Search for relevant skills."""
         return await handle_search_skills(
-            {"task_description": task_description, "top_k": top_k, "list_documents": list_documents},
+            {"task_description": task_description, "top_k": top_k},
             search_engine,
             loading_state_global,
             default_top_k,
-            max_content_chars,
+            max_results,
         )
     
     @mcp.tool(
@@ -223,7 +225,7 @@ async def initialize_backend(config_path: str | None = None, verbose: bool = Fal
     # Register MCP tools
     register_mcp_tools(
         default_top_k=config["default_top_k"],
-        max_content_chars=config.get("max_skill_content_chars"),
+        max_results=config.get("max_search_results", 3),
     )
 
     # Define batch callback for incremental loading

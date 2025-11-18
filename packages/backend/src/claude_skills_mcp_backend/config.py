@@ -20,7 +20,7 @@ DEFAULT_CONFIG = {
     ],
     "embedding_model": "all-MiniLM-L6-v2",
     "default_top_k": 3,
-    "max_skill_content_chars": None,  # None for unlimited, or an integer to limit
+    "max_search_results": 3,  # Clamp search responses to this many skills
     "load_skill_documents": True,  # Load additional files from skill directories
     "max_image_size_bytes": 5242880,  # 5MB limit for image files
     "allowed_image_extensions": [".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"],
@@ -105,8 +105,8 @@ def get_example_config() -> str:
         ],
         "embedding_model": "all-MiniLM-L6-v2",
         "default_top_k": 3,
-        "max_skill_content_chars": None,
-        "comment_max_chars": "Set to an integer (e.g., 5000) to truncate skill content, or null for unlimited",
+        "max_search_results": 3,
+        "comment_max_results": "Maximum number of skills returned per search response",
         "load_skill_documents": True,
         "max_image_size_bytes": 5242880,
         "allowed_image_extensions": [".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"],
