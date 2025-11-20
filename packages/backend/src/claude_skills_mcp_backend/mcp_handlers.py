@@ -100,6 +100,8 @@ class SkillsMCPServer:
         The search engine instance.
     default_top_k : int
         Default number of results to return.
+    max_content_chars : int | None
+        Maximum characters for skill content (None for unlimited).
     loading_state : LoadingState
         State tracker for background skill loading.
     """
@@ -109,7 +111,7 @@ class SkillsMCPServer:
         search_engine: SkillSearchEngine,
         loading_state: LoadingState,
         default_top_k: int = 3,
-        max_results: int = 3,
+        max_content_chars: int | None = None,
     ):
         """Initialize the MCP server.
 
@@ -121,13 +123,13 @@ class SkillsMCPServer:
             State tracker for background skill loading.
         default_top_k : int, optional
             Default number of results to return, by default 3.
-        max_results : int, optional
-            Maximum number of search results to return, by default 3.
+        max_content_chars : int | None, optional
+            Maximum characters for skill content. None for unlimited, by default None.
         """
         self.search_engine = search_engine
         self.loading_state = loading_state
         self.default_top_k = default_top_k
-        self.max_results = max_results
+        self.max_content_chars = max_content_chars
         self.server = Server("claude-skills-mcp")
 
         # Register handlers
@@ -169,6 +171,11 @@ class SkillsMCPServer:
                                 "default": self.default_top_k,
                                 "minimum": 1,
                                 "maximum": 20,
+                            },
+                            "list_documents": {
+                                "type": "boolean",
+                                "description": "Include a list of available documents (scripts, references, assets) for each skill (default: True)",
+                                "default": True,
                             },
                         },
                         "required": ["task_description"],
@@ -256,8 +263,8 @@ class SkillsMCPServer:
         if not task_description:
             raise ValueError("task_description is required")
 
-        requested_top_k = arguments.get("top_k", self.default_top_k)
-        top_k = min(self.max_results, self.default_top_k, requested_top_k)
+        top_k = arguments.get("top_k", self.default_top_k)
+        list_documents = arguments.get("list_documents", True)
 
         # Build formatted response
         response_parts = []
@@ -293,8 +300,7 @@ class SkillsMCPServer:
             ]
 
         response_parts.append(
-            f"Top {len(results)} skill(s) for: '{task_description}' "
-            f"(showing up to {self.max_results})\n"
+            f"Found {len(results)} relevant skill(s) for: '{task_description}'\n"
         )
 
         for i, result in enumerate(results, 1):
@@ -303,16 +309,34 @@ class SkillsMCPServer:
             response_parts.append(f"\nRelevance Score: {result['relevance_score']:.4f}")
             response_parts.append(f"\nSource: {result['source']}")
             response_parts.append(f"\nDescription: {result['description']}")
+
+            # Include document count if available
             documents = result.get("documents", {})
             if documents:
                 response_parts.append(
-                    f"\nDocuments: {len(documents)} available file(s)"
+                    f"\nAdditional Documents: {len(documents)} file(s)"
                 )
-            response_parts.append(f"\n{'=' * 80}\n")
 
-        response_parts.append(
-            "Use `read_skill_document` to open SKILL.md or supporting files."
-        )
+                # List documents if requested
+                if list_documents:
+                    response_parts.append("\nAvailable Documents:")
+                    for doc_path in sorted(documents.keys()):
+                        doc_info = documents[doc_path]
+                        doc_type = doc_info.get("type", "unknown")
+                        doc_size = doc_info.get("size", 0)
+                        size_kb = doc_size / 1024
+                        response_parts.append(
+                            f"  - {doc_path} ({doc_type}, {size_kb:.1f} KB)"
+                        )
+
+            response_parts.append(f"\n{'-' * 80}")
+            response_parts.append("\nFull Content:\n")
+
+            # Include the full SKILL.md content (no truncation)
+            content = result["content"]
+            response_parts.append(content)
+
+            response_parts.append(f"\n{'=' * 80}\n")
 
         return [TextContent(type="text", text="\n".join(response_parts))]
 
@@ -550,7 +574,7 @@ async def handle_search_skills(
     search_engine,
     loading_state,
     default_top_k: int = 3,
-    max_results: int = 3,
+    max_content_chars: int | None = None,
 ) -> list[TextContent]:
     """Handle find_helpful_skills tool calls (standalone version for HTTP server)."""
 
@@ -558,8 +582,8 @@ async def handle_search_skills(
     if not task_description:
         raise ValueError("task_description is required")
 
-    requested_top_k = arguments.get("top_k", default_top_k)
-    top_k = min(max_results, default_top_k, requested_top_k)
+    top_k = arguments.get("top_k", default_top_k)
+    list_documents = arguments.get("list_documents", True)
 
     response_parts = []
 
@@ -592,8 +616,7 @@ async def handle_search_skills(
         ]
 
     response_parts.append(
-        f"Top {len(results)} skill(s) for: '{task_description}' "
-        f"(showing up to {max_results})\n"
+        f"Found {len(results)} relevant skill(s) for: '{task_description}'\n"
     )
 
     for i, result in enumerate(results, 1):
@@ -605,13 +628,26 @@ async def handle_search_skills(
 
         documents = result.get("documents", {})
         if documents:
-            response_parts.append(f"\nDocuments: {len(documents)} available file(s)")
+            response_parts.append(f"\nAdditional Documents: {len(documents)} file(s)")
+
+            if list_documents:
+                response_parts.append("\nAvailable Documents:")
+                for doc_path in sorted(documents.keys()):
+                    doc_info = documents[doc_path]
+                    doc_type = doc_info.get("type", "unknown")
+                    doc_size = doc_info.get("size", 0)
+                    size_kb = doc_size / 1024
+                    response_parts.append(
+                        f"  - {doc_path} ({doc_type}, {size_kb:.1f} KB)"
+                    )
+
+        response_parts.append(f"\n{'-' * 80}")
+        response_parts.append("\nFull Content:\n")
+
+        content = result["content"]
+        response_parts.append(content)
 
         response_parts.append(f"\n{'=' * 80}\n")
-
-    response_parts.append(
-        "Use `read_skill_document` to open SKILL.md or supporting files."
-    )
 
     return [TextContent(type="text", text="\n".join(response_parts))]
 
